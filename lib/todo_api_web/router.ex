@@ -3,6 +3,7 @@ defmodule TodoApiWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug CORSPlug, origin: "http://localhost:8080"
   end
 
   scope "/api", TodoApiWeb do
