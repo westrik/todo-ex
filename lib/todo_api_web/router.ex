@@ -2,17 +2,20 @@ defmodule TodoApiWeb.Router do
   use TodoApiWeb, :router
 
   pipeline :api do
+    plug CORSPlug, origin: "*" # TODO: restrict this
     plug :accepts, ["json"]
-    plug CORSPlug, origin: "http://localhost:8080"
   end
 
   scope "/api", TodoApiWeb do
     pipe_through :api
-    resources "/users", UserController, except: [:new, :edit]
-    resources "/todos", TodoController, except: [:new, :edit]
+    get "/users", UserController, :index
+    get "/todos", TodoController, :index
+    get "/todos/:id", TodoController, :show
+    post "/todos", TodoController, :create
   end
 
   pipeline :browser do
+    plug CORSPlug, origin: "*" # TODO: restrict this
     plug(:accepts, ["html"])
   end
 
