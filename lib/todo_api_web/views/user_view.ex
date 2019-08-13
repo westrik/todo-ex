@@ -10,9 +10,11 @@ defmodule TodoApiWeb.UserView do
     %{data: render_one(user, UserView, "user.json")}
   end
 
-  def render("user.json", %{user: user}) do
-    %{id: user.id,
+  def render("user.json", %{user: user, token: token}) do
+    %{
+      token: token,
       name: user.name,
-      login: user.login}
+      login: user.login,
+    }
   end
 end

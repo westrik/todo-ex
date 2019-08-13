@@ -3,6 +3,7 @@ defmodule TodoApiWeb.UserController do
 
   alias TodoApi.Accounts
   alias TodoApi.Accounts.User
+  alias TodoApiWeb.Auth.Guardian
 
   action_fallback TodoApiWeb.FallbackController
 
@@ -12,11 +13,19 @@ defmodule TodoApiWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
+    with {:ok, %User{} = user} <- Accounts.create_user(user_params),
+         {:ok, token, _claims} <- Guardian.encode_and_sign(user) do
+        conn
+        |> put_status(:created)
+        |> render("user.json", %{user: user, token: token})
+    end
+  end
+
+  def signin(conn, %{"login" => login, "password" => password}) do
+    with {:ok, user, token} <- Guardian.authenticate(login, password) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.user_path(conn, :show, user))
-      |> render("show.json", user: user)
+      |> render("user.json", %{user: user, token: token})
     end
   end
 
